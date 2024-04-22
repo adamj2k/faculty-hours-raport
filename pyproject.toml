@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "faculty-hours-raport"
+version = "0.1.0"
+description = ""
+authors = ["Adam <adamjawor@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.109.2"
+uvicorn = "^0.27.1"
+authlib = "~1.3"
+httpx = "^0.27.0"
+itsdangerous = "^2.1.2"
+
+
+[tool.poetry.group.dev.dependencies]
+PyJWT = "^2.8.0"
+python-dotenv = "^1.0.1"
+pre-commit = "^3.6.2"
+black = "^24.2.0"
+isort = "^5.13.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
