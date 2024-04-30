@@ -1,0 +1,32 @@
+version: '3.9'
+name: faculty-hours-raport
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: ./.docker/Dockerfile
+    volumes:
+      - ../:/app/
+    ports:
+      - "8200:8200"
+    networks:
+      - faculty_network
+      - common_network
+  mongos:
+    container_name: mongos-report
+    image: mongo
+    ports:
+      - "30000:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - ./mongo:/data/db
+    networks:
+      - faculty_network
+      - common_network
+networks:
+  faculty_network:
+    driver: bridge
+  common_network:
+    external: true
