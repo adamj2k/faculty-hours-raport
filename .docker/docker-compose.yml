@@ -12,6 +12,19 @@ services:
     networks:
       - faculty_network
       - common_network
+  mongos:
+    container_name: mongos-report
+    image: mongo
+    ports:
+      - "30000:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - ./mongo:/data/db
+    networks:
+      - faculty_network
+      - common_network
 networks:
   faculty_network:
     driver: bridge
