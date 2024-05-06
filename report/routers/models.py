@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
@@ -17,6 +18,15 @@ class PersonalWorkloadReport(BaseModel):
     difference_pensum_sum_hours: int
 
 
+class ListPersonalWorkloadReport(BaseModel):
+    personal_workload_report: List[PersonalWorkloadReport]
+
+
+class PersonalWorkloadReportCreateResponse(BaseModel):
+    created: PersonalWorkloadReport
+    timestamp: datetime
+
+
 class SummaryClassesDepartmentReport(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     subject: str
@@ -32,6 +42,15 @@ class SummaryClassesDepartmentReport(BaseModel):
     hours_for_teacher: int
 
 
+class ListSummaryClassesDepartmentReport(BaseModel):
+    summary_classes_department_report: List[SummaryClassesDepartmentReport]
+
+
+class SummaryClassesDepartmentReportCreateResponse(BaseModel):
+    created: SummaryClassesDepartmentReport
+    timestamp: datetime
+
+
 class TeacherReport(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     teacher: str
@@ -44,3 +63,8 @@ class TeacherReport(BaseModel):
 
 class ListTeacherReports(BaseModel):
     teacher_reports: List[TeacherReport]
+
+
+class TeacherReportCreateResponse(BaseModel):
+    created: TeacherReport
+    timestamp: datetime

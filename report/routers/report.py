@@ -3,7 +3,9 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import Response
 
 from .database import reports_collection
-from .models import ListTeacherReports, TeacherReport
+from .models import ListTeacherReports  # noqa
+from .models import TeacherReport  # noqa
+from .models import TeacherReportCreateResponse  # noqa; noqa
 
 router = APIRouter()
 
@@ -25,7 +27,7 @@ async def read_teacher_report(id: str):
     return teacher_report
 
 
-@router.post("/teacher-report/", response_model=TeacherReport)
+@router.post("/teacher-report/create/", response_model=TeacherReportCreateResponse)
 async def create_teacher_report(teacher_report: TeacherReport):
     new_report = await reports_collection.insert_one(
         teacher_report.model_dump(by_alias=True, exclude=["id"])
@@ -34,7 +36,7 @@ async def create_teacher_report(teacher_report: TeacherReport):
     return created_report
 
 
-@router.delete("/teacher-report/{id}", response_model=TeacherReport)
+@router.delete("/teacher-report/delete/{id}", response_model=TeacherReport)
 async def delete_teacher_report(id: str):
     deleted_report = await reports_collection.find_one_and_delete({"_id": ObjectId(id)})
     if deleted_report is None:
