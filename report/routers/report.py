@@ -2,8 +2,14 @@ from bson import ObjectId
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import Response
 
-from .database import reports_collection
+from .database import personal_workload_reports_collection, reports_collection
+from .models import ListPersonalWorkloadReport  # noqa
+from .models import ListSummaryClassesDepartmentReport  # noqa
 from .models import ListTeacherReports  # noqa
+from .models import PersonalWorkloadReport  # noqa
+from .models import PersonalWorkloadReportCreateResponse  # noqa
+from .models import SummaryClassesDepartmentReport  # noqa
+from .models import SummaryClassesDepartmentReportCreateResponse  # noqa
 from .models import TeacherReport  # noqa
 from .models import TeacherReportCreateResponse  # noqa; noqa
 
@@ -44,3 +50,44 @@ async def delete_teacher_report(id: str):
             status_code=status.HTTP_404_NOT_FOUND, detail="Report not found"
         )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/personal-workload-report-list", response_model=ListPersonalWorkloadReport)
+async def read_personal_workload_report():
+    return ListPersonalWorkloadReport(
+        personal_workload_report=await personal_workload_reports_collection.find().to_list(
+            1000
+        )
+    )
+
+
+@router.get("/personal-workload-report/{id}", response_model=PersonalWorkloadReport)
+async def read_personal_workload_report(id: str):
+    personal_workload_report = await personal_workload_reports_collection.find_one(
+        {"_id": ObjectId(id)}
+    )
+    if personal_workload_report is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Report not found"
+        )
+    return personal_workload_report
+
+
+@router.post(
+    "/personal-workload-report/create/",
+    response_model=PersonalWorkloadReportCreateResponse,
+)
+async def create_personal_workload_report(
+    personal_workload_report: PersonalWorkloadReport,
+):
+    new_personal_workload_report = (
+        await personal_workload_reports_collection.insert_one(
+            personal_workload_report.model_dump(by_alias=True, exclude=["id"])
+        )
+    )
+    created_personal_workload_report = (
+        await personal_workload_reports_collection.find_one(
+            {"_id": new_personal_workload_report.inserted_id}
+        )
+    )
+    return created_personal_workload_report
