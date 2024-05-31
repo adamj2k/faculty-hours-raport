@@ -2,21 +2,24 @@ from bson import ObjectId
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import Response
 
-from .database import personal_workload_reports_collection, reports_collection
-from .models import ListPersonalWorkloadReport  # noqa
-from .models import ListSummaryClassesDepartmentReport  # noqa
-from .models import ListTeacherReports  # noqa
-from .models import PersonalWorkloadReport  # noqa
-from .models import PersonalWorkloadReportCreateResponse  # noqa
-from .models import SummaryClassesDepartmentReport  # noqa
-from .models import SummaryClassesDepartmentReportCreateResponse  # noqa
-from .models import TeacherReport  # noqa
-from .models import TeacherReportCreateResponse  # noqa; noqa
+from report.routers.database import (
+    personal_workload_reports_collection,
+    reports_collection,
+)
+from report.routers.generate_reports import generate_teachers_reports
+from report.routers.models import (
+    ListPersonalWorkloadReport,
+    ListTeacherReports,
+    PersonalWorkloadReport,
+    PersonalWorkloadReportCreateResponse,
+    TeacherReport,
+    TeacherReportCreateResponse,
+)
 
 router = APIRouter()
 
 
-@router.get("/teacher-reports-list", response_model=ListTeacherReports)
+@router.get("/teacher-reports/list", response_model=ListTeacherReports)
 async def read_reports():
     return ListTeacherReports(
         teacher_reports=await reports_collection.find().to_list(1000)
@@ -52,7 +55,7 @@ async def delete_teacher_report(id: str):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.get("/personal-workload-report-list", response_model=ListPersonalWorkloadReport)
+@router.get("/personal-workload-report/list", response_model=ListPersonalWorkloadReport)
 async def read_personal_workload_report():
     return ListPersonalWorkloadReport(
         personal_workload_report=await personal_workload_reports_collection.find().to_list(
@@ -91,3 +94,16 @@ async def create_personal_workload_report(
         )
     )
     return created_personal_workload_report
+
+
+@router.post("/teacher-reports/create/", response_model=ListTeacherReports)
+async def create_teacher_report(reports: ListTeacherReports):
+    reports = await generate_teachers_reports()
+    created_reports = []
+    for report in reports:
+        await reports_collection.insert_one(
+            report.model_dump(by_alias=True, exclude=["id"])
+        )
+        created_report = await reports_collection.find_one({"_id": report.inserted_id})
+        created_reports.append(created_report)
+    return created_reports
