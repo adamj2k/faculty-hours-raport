@@ -1,11 +1,12 @@
 from bson import ObjectId
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, status
 from fastapi.responses import Response
 
 from report.routers.database import (
     personal_workload_reports_collection,
     reports_collection,
 )
+from report.routers.exceptions import FeatureNotFindException
 from report.routers.generate_reports import generate_teachers_reports
 from report.routers.models import (
     ListPersonalWorkloadReport,
@@ -30,9 +31,7 @@ async def read_reports():
 async def read_teacher_report(id: str):
     teacher_report = await reports_collection.find_one({"_id": ObjectId(id)})
     if teacher_report is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Report not found"
-        )
+        raise FeatureNotFindException
     return teacher_report
 
 
@@ -49,9 +48,7 @@ async def create_teacher_report(teacher_report: TeacherReport):
 async def delete_teacher_report(id: str):
     deleted_report = await reports_collection.find_one_and_delete({"_id": ObjectId(id)})
     if deleted_report is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Report not found"
-        )
+        raise FeatureNotFindException
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -70,9 +67,7 @@ async def read_personal_workload_report(id: str):
         {"_id": ObjectId(id)}
     )
     if personal_workload_report is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Report not found"
-        )
+        raise FeatureNotFindException
     return personal_workload_report
 
 
