@@ -1,7 +1,8 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import report
+
+from report.routers import report
 
 app = FastAPI()
 

@@ -16,4 +16,6 @@ COPY ./ /app/
 RUN poetry config virtualenvs.create false \
     &&poetry install
 
+ENV PYTHONPATH "${PYTHONPATH}:/app"
+
 CMD ["python3", "./report/main.py"]

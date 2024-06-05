@@ -4,7 +4,7 @@ from io import StringIO
 import pandas as pd
 
 # from get_data import get_all_teachers, get_all_lectures
-from test_data import (
+from report.routers.test_data import (
     all_exercises_test_data,
     all_lectures_test_data,
     all_teachers_test_data,
