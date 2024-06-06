@@ -6,4 +6,6 @@ class FeatureNotFindException(HTTPException):
     detail = "Feature not found"
 
     def __init__(self):
-        super().__init__(self.status_code, self.detail)
+        super().__init__(
+            FeatureNotFindException.status_code, FeatureNotFindException.detail
+        )
