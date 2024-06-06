@@ -1,5 +1,6 @@
 import motor.motor_asyncio
-from settings import MONGODB_URL
+
+from report.settings import MONGODB_URL
 
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URL)
 database = client["faculty-reports"]
