@@ -27,3 +27,14 @@ def generate_teachers_reports():
     df_complete_report = df_data_to_report.groupby(["id_x"]).sum()
 
     return df_complete_report
+
+
+def generate_personal_workload_reports(teacher_id):
+    teachers_report = generate_teachers_reports()
+    personal_workload_report = teachers_report.loc[teacher_id]
+
+    return personal_workload_report
+
+
+def generate_summary_reports():
+    pass

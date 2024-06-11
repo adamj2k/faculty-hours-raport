@@ -22,3 +22,9 @@ async def get_all_exercises():
     api_url = f"http://{FH_APP_FACULTY_URL}/faculty/exercise/list"
     all_exercises = await requests.get(api_url).json()
     return all_exercises
+
+
+async def get_teacher(id):
+    api_url = f"http://{FH_APP_FACULTY_URL}/faculty/teacher/{id}"
+    teacher = await requests.get(api_url).json()
+    return teacher
