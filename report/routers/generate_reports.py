@@ -37,4 +37,19 @@ def generate_personal_workload_reports(teacher_id):
 
 
 def generate_summary_reports():
-    pass
+    all_teachers = get_all_teachers()
+    all_lectures = get_all_lectures()
+    all_exercises = get_all_exercises()
+    df_teachers = pd.read_json(all_teachers, orient="records")
+    df_lectures = pd.read_json(all_lectures, orient="records")
+    df_exercises = pd.read_json(all_exercises, orient="records")
+    df_concat_exercises_lectures = pd.concat([df_lectures, df_exercises])
+    df_merge_with_teachers = pd.merge(
+        df_concat_exercises_lectures,
+        df_teachers,
+        how="left",
+        left_on="teacher_id",
+        right_on="id",
+    ).sort_values(by="name_x")
+
+    return df_merge_with_teachers
