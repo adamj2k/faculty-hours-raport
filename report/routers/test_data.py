@@ -12,7 +12,7 @@ all_exercises_test_data = {
     "exercises": [
         {
             "id": 1,
-            "name": "Prawo pracy",
+            "name": "prawo pracy",
             "study_year": 3,
             "semester": 2,
             "hours_exercises": 30,
@@ -22,7 +22,7 @@ all_exercises_test_data = {
         },
         {
             "id": 2,
-            "name": "Prawo pracy2",
+            "name": "prawo pracy2",
             "study_year": 4,
             "semester": 1,
             "hours_exercises": 30,
@@ -37,7 +37,7 @@ all_lectures_test_data = {
     "lectures": [
         {
             "id": 1,
-            "name": "prawo",
+            "name": "prawo pracy",
             "study_year": 3,
             "semester": 2,
             "hours_lectures": 60,

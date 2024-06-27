@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from report.routers import report
+from report.routers import report_endpoints
 
 app = FastAPI()
 
@@ -19,7 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(report.router, prefix="/report")
+app.include_router(report_endpoints.router, prefix="/report")
 
 
 if __name__ == "__main__":

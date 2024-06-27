@@ -4,7 +4,7 @@ from fastapi.responses import Response
 
 from report.routers.database import (
     personal_workload_reports_collection,
-    reports_collection,
+    teachers_reports_collection,
 )
 from report.routers.exceptions import FeatureNotFindException
 from report.routers.generate_reports import generate_teachers_reports
@@ -23,13 +23,13 @@ router = APIRouter()
 @router.get("/teacher-reports/list", response_model=ListTeacherReports)
 async def read_reports():
     return ListTeacherReports(
-        teacher_reports=await reports_collection.find().to_list(1000)
+        teacher_reports=await teachers_reports_collection.find().to_list(1000)
     )
 
 
 @router.get("/teacher-report/{id}", response_model=TeacherReport)
 async def read_teacher_report(id: str):
-    teacher_report = await reports_collection.find_one({"_id": ObjectId(id)})
+    teacher_report = await teachers_reports_collection.find_one({"_id": ObjectId(id)})
     if teacher_report is None:
         raise FeatureNotFindException
     return teacher_report
@@ -37,16 +37,20 @@ async def read_teacher_report(id: str):
 
 @router.post("/teacher-report/create/", response_model=TeacherReportCreateResponse)
 async def create_teacher_report(teacher_report: TeacherReport):
-    new_report = await reports_collection.insert_one(
+    new_report = await teachers_reports_collection.insert_one(
         teacher_report.model_dump(by_alias=True, exclude=["id"])
     )
-    created_report = await reports_collection.find_one({"_id": new_report.inserted_id})
+    created_report = await teachers_reports_collection.find_one(
+        {"_id": new_report.inserted_id}
+    )
     return created_report
 
 
 @router.delete("/teacher-report/delete/{id}", response_model=TeacherReport)
 async def delete_teacher_report(id: str):
-    deleted_report = await reports_collection.find_one_and_delete({"_id": ObjectId(id)})
+    deleted_report = await teachers_reports_collection.find_one_and_delete(
+        {"_id": ObjectId(id)}
+    )
     if deleted_report is None:
         raise FeatureNotFindException
     return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -96,9 +100,11 @@ async def create_teacher_report(reports: ListTeacherReports):
     reports = await generate_teachers_reports()
     created_reports = []
     for report in reports:
-        await reports_collection.insert_one(
+        await teachers_reports_collection.insert_one(
             report.model_dump(by_alias=True, exclude=["id"])
         )
-        created_report = await reports_collection.find_one({"_id": report.inserted_id})
+        created_report = await teachers_reports_collection.find_one(
+            {"_id": report.inserted_id}
+        )
         created_reports.append(created_report)
     return created_reports
