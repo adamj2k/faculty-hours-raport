@@ -25,15 +25,15 @@ def generate_teachers_reports():
         right_on="teacher_id",
     )
     df_complete_report = df_data_to_report.groupby(["id_x"]).sum()
-
-    return df_complete_report
+    report = df_complete_report.to_json(orient="records")
+    return report
 
 
 def generate_personal_workload_reports(teacher_id):
     teachers_report = generate_teachers_reports()
     personal_workload_report = teachers_report.loc[teacher_id]
-
-    return personal_workload_report
+    report = personal_workload_report.to_json(orient="records")
+    return report
 
 
 def generate_summary_reports():
@@ -51,5 +51,5 @@ def generate_summary_reports():
         left_on="teacher_id",
         right_on="id",
     ).sort_values(by="name_x")
-
-    return df_merge_with_teachers
+    report = df_merge_with_teachers.to_json(orient="records")
+    return report
