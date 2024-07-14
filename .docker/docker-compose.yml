@@ -2,6 +2,8 @@ version: '3.9'
 name: faculty-hours-raport
 services:
   report:
+    env_file:
+      - .env
     build:
       context: ..
       dockerfile: ./.docker/Dockerfile

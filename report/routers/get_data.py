@@ -6,25 +6,25 @@ from report.settings import FH_APP_FACULTY_URL
 router = APIRouter()
 
 
-async def get_all_teachers():
-    api_url = f"http://{FH_APP_FACULTY_URL}/faculty/teacher/list"
-    all_teachers = await requests.get(api_url).json()
-    return all_teachers
+def get_all_teachers():
+    api_url = f"http://{FH_APP_FACULTY_URL}/faculty/teacher/list/"
+    all_teachers = requests.get(api_url).json()
+    return all_teachers["teachers"]
 
 
-async def get_all_lectures():
-    api_url = f"http://{FH_APP_FACULTY_URL}/faculty/lecture/list"
-    all_lectures = await requests.get(api_url).json()
-    return all_lectures
+def get_all_lectures():
+    api_url = f"http://{FH_APP_FACULTY_URL}/faculty/lecture/list/"
+    all_lectures = requests.get(api_url).json()
+    return all_lectures["lectures"]
 
 
-async def get_all_exercises():
-    api_url = f"http://{FH_APP_FACULTY_URL}/faculty/exercise/list"
-    all_exercises = await requests.get(api_url).json()
-    return all_exercises
+def get_all_exercises():
+    api_url = f"http://{FH_APP_FACULTY_URL}/faculty/exercise/list/"
+    all_exercises = requests.get(api_url).json()
+    return all_exercises["exercises"]
 
 
-async def get_teacher(id):
+def get_teacher(id):
     api_url = f"http://{FH_APP_FACULTY_URL}/faculty/teacher/{id}"
-    teacher = await requests.get(api_url).json()
+    teacher = requests.get(api_url).json()
     return teacher

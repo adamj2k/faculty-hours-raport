@@ -2,6 +2,7 @@ from bson import ObjectId
 from fastapi import APIRouter, status
 from fastapi.responses import Response
 
+from report.routers.consumer import consumer
 from report.routers.database import (
     personal_workload_reports_collection,
     teachers_reports_collection,
@@ -108,3 +109,16 @@ async def create_teacher_report(reports: ListTeacherReports):
         )
         created_reports.append(created_report)
     return created_reports
+
+
+@router.get("consume/")
+async def consume_queue():
+    """
+    Temporary endpoint to start consumer function
+    Need to be removed in the future
+    TODO : remove this endpoint
+    TODO : change consumer function to async class
+    """
+    print("starting consumer function")
+    await consumer()
+    return Response(status_code=status.HTTP_200_OK)

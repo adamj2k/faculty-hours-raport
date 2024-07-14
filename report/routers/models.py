@@ -17,6 +17,9 @@ class PersonalWorkloadReport(BaseModel):
     sum_hours: int
     difference_pensum_sum_hours: int
 
+    def saving_to_mongo(self):
+        return dict(self)
+
 
 class ListPersonalWorkloadReport(BaseModel):
     personal_workload_report: List[PersonalWorkloadReport]
@@ -41,6 +44,9 @@ class SummaryClassesDepartmentReport(BaseModel):
     groups_for_teacher: int
     hours_for_teacher: int
 
+    def saving_to_mongo(self):
+        return dict(self)
+
 
 class ListSummaryClassesDepartmentReport(BaseModel):
     summary_classes_department_report: List[SummaryClassesDepartmentReport]
@@ -59,6 +65,9 @@ class TeacherReport(BaseModel):
     hours_exercises: int
     study_year: int
     semester: int
+
+    def saving_to_mongo(self):
+        return dict(self)
 
 
 class ListTeacherReports(BaseModel):
