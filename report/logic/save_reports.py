@@ -1,11 +1,11 @@
 import pandas as pd
 
-from report.routers.database import (
+from report.models.database import (
     personal_workload_reports_collection,
     summary_reports_collection,
     teachers_reports_collection,
 )
-from report.routers.models import (
+from report.models.models import (
     PersonalWorkloadReport,
     SummaryClassesDepartmentReport,
     TeacherReport,

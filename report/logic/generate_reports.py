@@ -9,70 +9,50 @@ from report.routers.get_data import (
     get_all_teachers,
     get_teacher,
 )
-
-
-def convert_data_to_int(value):
-    try:
-        return int(value)
-    except (ValueError, TypeError):
-        return 0
-
-
-def convert_data_to_str(value):
-    try:
-        return str(value)
-    except (ValueError, TypeError):
-        return ""
+from report.utils.utils import (
+    convert_data_to_data_frame,
+    convert_data_to_int,
+    convert_data_to_str,
+)
 
 
 def generate_teachers_reports():
-    try:
-        all_teachers = get_all_teachers()
-        all_lectures = get_all_lectures()
-        all_exercises = get_all_exercises()
-        df_teachers = pd.read_json(
-            io.StringIO(json.dumps(all_teachers)), orient="records"
-        )
-        df_lectures = pd.read_json(
-            io.StringIO(json.dumps(all_lectures)), orient="records"
-        )
-        df_exercises = pd.read_json(
-            io.StringIO(json.dumps(all_exercises)), orient="records"
-        )
-        df_join_exercises_lectures = pd.concat([df_lectures, df_exercises])
-        df_data_to_report = pd.merge(
-            df_teachers,
-            df_join_exercises_lectures,
-            how="left",
-            left_on="id",
-            right_on="teacher_id",
-        )
-        df_data_to_report["teacher"] = (
-            df_data_to_report["name_x"] + " " + df_data_to_report["last_name"]
-        )
-        columns_to_move_to_report = [
-            "id_x",
-            "teacher",
-            "name_y",
-            "hours_lectures",
-            "hours_exercises",
-            "study_year",
-            "semester",
-        ]
-        df_report = df_data_to_report[columns_to_move_to_report].copy()
-        df_report = df_report.rename(columns={"id_x": "id", "name_y": "subject"})
-        df_report["study_year"] = df_report["study_year"].apply(convert_data_to_int)
-        df_report["semester"] = df_report["semester"].apply(convert_data_to_int)
-        df_report["hours_lectures"] = df_report["hours_lectures"].apply(
-            convert_data_to_int
-        )
-        df_report["hours_exercises"] = df_report["hours_exercises"].apply(
-            convert_data_to_int
-        )
-        df_report["subject"] = df_report["subject"].apply(convert_data_to_str)
-        return df_report
-    except Exception as error:
-        print(f"Generate teachers report ERROR --- {error}")
+    all_teachers = get_all_teachers()
+    all_lectures = get_all_lectures()
+    all_exercises = get_all_exercises()
+    df_teachers = convert_data_to_data_frame(all_teachers)
+    df_lectures = convert_data_to_data_frame(all_lectures)
+    df_exercises = convert_data_to_data_frame(all_exercises)
+    df_join_exercises_lectures = pd.concat([df_lectures, df_exercises])
+    df_data_to_report = pd.merge(
+        df_teachers,
+        df_join_exercises_lectures,
+        how="left",
+        left_on="id",
+        right_on="teacher_id",
+    )
+    df_data_to_report["teacher"] = (
+        df_data_to_report["name_x"] + " " + df_data_to_report["last_name"]
+    )
+    columns_to_move_to_report = [
+        "id_x",
+        "teacher",
+        "name_y",
+        "hours_lectures",
+        "hours_exercises",
+        "study_year",
+        "semester",
+    ]
+    df_report = df_data_to_report[columns_to_move_to_report].copy()
+    df_report = df_report.rename(columns={"id_x": "id", "name_y": "subject"})
+    df_report["study_year"] = df_report["study_year"].apply(convert_data_to_int)
+    df_report["semester"] = df_report["semester"].apply(convert_data_to_int)
+    df_report["hours_lectures"] = df_report["hours_lectures"].apply(convert_data_to_int)
+    df_report["hours_exercises"] = df_report["hours_exercises"].apply(
+        convert_data_to_int
+    )
+    df_report["subject"] = df_report["subject"].apply(convert_data_to_str)
+    return df_report
 
 
 def generate_personal_workload_reports(teacher_id: int):

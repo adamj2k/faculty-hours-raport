@@ -1,29 +1,18 @@
-import re
-
 import pika
 import pika.adapters.asyncio_connection
 
-from report.routers.generate_reports import (
+from report.logic.generate_reports import (
     generate_personal_workload_reports,
     generate_summary_reports,
     generate_teachers_reports,
 )
-from report.routers.save_reports import (
+from report.logic.save_reports import (
     save_personal_workload_report,
     save_summary_report,
     save_teachers_report,
 )
 from report.settings import RABBITMQ_HOST, RABBITMQ_PASSWORD, RABBITMQ_USER
-
-
-def find_teacher_id_in_body(body):
-    """
-    Find and extract the teacher ID from the given body.
-    """
-    pattern = r"id=(\d+)"
-    teacher_id_list = re.findall(pattern, str(body))
-    teacher_id = int(teacher_id_list[0])
-    return teacher_id
+from report.utils.utils import find_teacher_id_in_body
 
 
 def callback_teacher_report(ch, method, properties, body):
