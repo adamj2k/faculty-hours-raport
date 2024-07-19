@@ -15,7 +15,6 @@ from report.models.models import (
     TeacherReportCreateResponse,
 )
 from report.routers.exceptions import FeatureNotFindException
-from report.services.consumer import consumer
 
 router = APIRouter()
 
@@ -93,16 +92,3 @@ async def create_personal_workload_report(
         )
     )
     return created_personal_workload_report
-
-
-@router.get("consume/")
-async def consume_queue():
-    """
-    Temporary endpoint to start consumer function
-    Need to be removed in the future
-    TODO : remove this endpoint
-    TODO : change consumer function to async class
-    """
-    print("starting consumer function")
-    await consumer()
-    return Response(status_code=status.HTTP_200_OK)

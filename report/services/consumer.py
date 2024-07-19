@@ -1,5 +1,6 @@
 import pika
 import pika.adapters.asyncio_connection
+from aio_pika import IncomingMessage, connect_robust
 
 from report.logic.generate_reports import (
     generate_personal_workload_reports,
@@ -15,28 +16,28 @@ from report.settings import RABBITMQ_HOST, RABBITMQ_PASSWORD, RABBITMQ_USER
 from report.utils.utils import find_teacher_id_in_body
 
 
-def callback_teacher_report(ch, method, properties, body):
-    print(f"Working on message {body}")
+async def callback_teacher_report(message: IncomingMessage):
+    await message.ack()
+    body = message.body.decode("utf-8")
     report = generate_teachers_reports()
     save_teachers_report(report)
     print(f"{body} report is saved")
-    ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
-def callback_personal_report(ch, method, properties, body):
-    print(f"Making {body}")
+async def callback_personal_report(message: IncomingMessage):
+    await message.ack()
+    body = message.body.decode("utf-8")
     teacher_id = find_teacher_id_in_body(str(body))
     if not teacher_id:
         print(f"{body} not saved")
-        ch.basic_ack(delivery_tag=method.delivery_tag)
         return
     else:
         report = generate_personal_workload_reports(teacher_id)
         save_personal_workload_report(report)
         print(f"{body} saved")
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
+# TODO : change callback function to async with fix of generation summary report function
 def callback_summary_report(ch, method, properties, body):
     print(f"Making {body}")
     report = generate_summary_reports()
@@ -52,23 +53,33 @@ QUEUE_CALLBACK = {
 }
 
 
-def consumer():
-    """
-    Consuming messages from each queue in list QUEUE
-    """
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(
-            RABBITMQ_HOST,
-            5672,
-            "faculty-vhost",
-            pika.PlainCredentials(RABBITMQ_USER, RABBITMQ_PASSWORD),
+class PikaConsumer:
+    def __init__(self):
+        self.connection = pika.BlockingConnection(
+            pika.ConnectionParameters(
+                RABBITMQ_HOST,
+                5672,
+                "faculty-vhost",
+                pika.PlainCredentials(RABBITMQ_USER, RABBITMQ_PASSWORD),
+            )
         )
-    )
+        self.channel = self.connection.channel()
+        for index, (queue, callback) in enumerate(QUEUE_CALLBACK.items()):
+            self.channel.queue_declare(queue=queue, durable=True)
 
-    channel = connection.channel()
+    async def consume(self, loop):
+        connection = await connect_robust(
+            host=RABBITMQ_HOST,
+            virtualhost="faculty-vhost",
+            port=5672,
+            loop=loop,
+            login=RABBITMQ_USER,
+            password=RABBITMQ_PASSWORD,
+        )
+        channel = await connection.channel()
 
-    for index, (queue, callback) in enumerate(QUEUE_CALLBACK.items()):
-        channel.queue_declare(queue=queue, durable=True)
-        channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
+        for index, (queue, callback) in enumerate(QUEUE_CALLBACK.items()):
+            queue_connection = await channel.declare_queue(queue, durable=True)
+            await queue_connection.consume(callback, no_ack=False)
 
-    channel.start_consuming()
+        return connection
