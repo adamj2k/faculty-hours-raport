@@ -28,7 +28,15 @@ def save_personal_workload_report(report: pd.DataFrame):
 
 def save_summary_report(report: pd.DataFrame):
     report_data = report.to_dict(orient="records")
-    print(f"Saving {report_data}")
-    report_to_save = SummaryClassesDepartmentReport(**report_data[0])
-    # TODO: finish after fix generate summary report function
-    summary_reports_collection.insert_one(report_to_save.saving_to_mongo())
+    valid_reports = []
+    for report in report_data:
+        report_to_save = SummaryClassesDepartmentReport(**report)
+        report_to_save_dict = report_to_save.saving_to_mongo()
+        report_to_save_dict["teachers"] = [
+            teacher.model_dump(by_alias=True) for teacher in report_to_save.teachers
+        ]
+        valid_reports.append(report_to_save_dict)
+    if valid_reports:
+        summary_reports_collection.insert_many(valid_reports)
+    else:
+        print("No reports to save")

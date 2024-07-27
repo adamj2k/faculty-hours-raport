@@ -38,12 +38,13 @@ async def callback_personal_report(message: IncomingMessage):
 
 
 # TODO : change callback function to async with fix of generation summary report function
-def callback_summary_report(ch, method, properties, body):
+async def callback_summary_report(message: IncomingMessage):
+    await message.ack()
+    body = message.body.decode("utf-8")
     print(f"Making {body}")
     report = generate_summary_reports()
     save_summary_report(report)
     print(f"{body} saved")
-    ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
 QUEUE_CALLBACK = {

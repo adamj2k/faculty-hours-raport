@@ -30,6 +30,18 @@ class PersonalWorkloadReportCreateResponse(BaseModel):
     timestamp: datetime
 
 
+class Teacher(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    teacher_name: str
+    lecture_teacher: bool
+    exercise_teachers: bool
+    groups_for_teacher: int
+    hours_for_teacher: int
+
+    def saving_to_mongo(self):
+        return dict(self)
+
+
 class SummaryClassesDepartmentReport(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     subject: str
@@ -39,10 +51,7 @@ class SummaryClassesDepartmentReport(BaseModel):
     hours_lectures: int
     hours_exercises: int
     groups: int
-    lecture_teacher: str
-    exercise_teachers: int
-    groups_for_teacher: int
-    hours_for_teacher: int
+    teachers: List[Teacher]
 
     def saving_to_mongo(self):
         return dict(self)

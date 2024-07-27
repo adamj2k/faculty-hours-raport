@@ -12,6 +12,7 @@ from report.utils.utils import (
     convert_data_to_str,
     make_empty_personal_workload_report,
     make_personal_workload_report_with_data,
+    make_summary_classes_department_report,
 )
 
 
@@ -104,20 +105,22 @@ def generate_personal_workload_reports(teacher_id: int):
 
 
 def generate_summary_reports():
+    """
+    Generates summary reports by retrieving data from all teachers, lectures, and exercises.
+    Converts the data to DataFrame format using the convert_data_to_data_frame function.
+    Merges the lectures and exercises data using the pd.merge function.
+    Creates a summary report using the make_summary_classes_department_report function.
+
+    Returns:
+        report (DataFrame): A DataFrame containing the summary report.
+    """
     all_teachers = get_all_teachers()
     all_lectures = get_all_lectures()
     all_exercises = get_all_exercises()
     df_teachers = convert_data_to_data_frame(all_teachers)
     df_lectures = convert_data_to_data_frame(all_lectures)
     df_exercises = convert_data_to_data_frame(all_exercises)
-    df_concat_exercises_lectures = pd.concat([df_lectures, df_exercises])
-    df_merge_with_teachers = pd.merge(
-        df_concat_exercises_lectures,
-        df_teachers,
-        how="left",
-        left_on="teacher_id",
-        right_on="id",
-    ).sort_values(by="name_x")
-    # TODO need to fixed  to prepare report that validate with database model
-    print(f"Generate summary report --- {df_merge_with_teachers}")
-    return df_merge_with_teachers
+    report = make_summary_classes_department_report(
+        df_lectures, df_exercises, df_teachers
+    )
+    return report

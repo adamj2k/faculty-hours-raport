@@ -4,10 +4,12 @@ from fastapi.responses import Response
 
 from report.models.database import (
     personal_workload_reports_collection,
+    summary_reports_collection,
     teachers_reports_collection,
 )
 from report.models.models import (
     ListPersonalWorkloadReport,
+    ListSummaryClassesDepartmentReport,
     ListTeacherReports,
     PersonalWorkloadReport,
     PersonalWorkloadReportCreateResponse,
@@ -92,3 +94,10 @@ async def create_personal_workload_report(
         )
     )
     return created_personal_workload_report
+
+
+@router.get("/summary-report/list", response_model=ListSummaryClassesDepartmentReport)
+async def read_reports():
+    return ListSummaryClassesDepartmentReport(
+        summary_report=await summary_reports_collection.find().to_list(1000)
+    )
