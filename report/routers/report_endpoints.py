@@ -2,20 +2,21 @@ from bson import ObjectId
 from fastapi import APIRouter, status
 from fastapi.responses import Response
 
-from report.routers.database import (
+from report.models.database import (
     personal_workload_reports_collection,
+    summary_reports_collection,
     teachers_reports_collection,
 )
-from report.routers.exceptions import FeatureNotFindException
-from report.routers.generate_reports import generate_teachers_reports
-from report.routers.models import (
+from report.models.models import (
     ListPersonalWorkloadReport,
+    ListSummaryClassesDepartmentReport,
     ListTeacherReports,
     PersonalWorkloadReport,
     PersonalWorkloadReportCreateResponse,
     TeacherReport,
     TeacherReportCreateResponse,
 )
+from report.routers.exceptions import FeatureNotFindException
 
 router = APIRouter()
 
@@ -95,16 +96,8 @@ async def create_personal_workload_report(
     return created_personal_workload_report
 
 
-@router.post("/teacher-reports/create/", response_model=ListTeacherReports)
-async def create_teacher_report(reports: ListTeacherReports):
-    reports = await generate_teachers_reports()
-    created_reports = []
-    for report in reports:
-        await teachers_reports_collection.insert_one(
-            report.model_dump(by_alias=True, exclude=["id"])
-        )
-        created_report = await teachers_reports_collection.find_one(
-            {"_id": report.inserted_id}
-        )
-        created_reports.append(created_report)
-    return created_reports
+@router.get("/summary-report/list", response_model=ListSummaryClassesDepartmentReport)
+async def read_reports():
+    return ListSummaryClassesDepartmentReport(
+        summary_report=await summary_reports_collection.find().to_list(1000)
+    )

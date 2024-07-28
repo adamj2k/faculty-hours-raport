@@ -2,6 +2,8 @@ version: '3.9'
 name: faculty-hours-raport
 services:
   report:
+    env_file:
+      - .env
     build:
       context: ..
       dockerfile: ./.docker/Dockerfile
@@ -18,9 +20,8 @@ services:
     image: mongo
     ports:
       - "30000:27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=password
+    env_file:
+      - .env
     volumes:
       - mongo:/data/db
     networks:
