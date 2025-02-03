@@ -22,7 +22,7 @@ aio-pika = "^9.4.2"
 [tool.poetry.group.dev.dependencies]
 PyJWT = "^2.8.0"
 python-dotenv = "^1.0.1"
-pre-commit = "^3.6.2"
+pre-commit = "^4.1.0"
 black = "^24.2.0"
 isort = "^5.13.2"
 
