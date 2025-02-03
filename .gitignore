@@ -163,3 +163,7 @@ cython_debug/
 .docker/mongo/
 /mongo
 mongo
+
+# Kubernetes secrets
+.kube/faculty-hours-raport-chart/secret.values.yaml
+secret.values.yaml
