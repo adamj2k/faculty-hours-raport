@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from bson import ObjectId
 from fastapi import APIRouter, status
 from fastapi.responses import Response
@@ -21,11 +23,10 @@ from report.routers.exceptions import FeatureNotFindException
 router = APIRouter()
 
 
-@router.get("/teacher-reports/list", response_model=ListTeacherReports)
+@router.get("/teacher-report/list", response_model=ListTeacherReports)
 async def read_reports():
-    return ListTeacherReports(
-        teacher_reports=await teachers_reports_collection.find().to_list(1000)
-    )
+    reports = await teachers_reports_collection.find().to_list(1000)
+    return ListTeacherReports(teacher_reports=reports)
 
 
 @router.get("/teacher-report/{id}", response_model=TeacherReport)
@@ -44,10 +45,10 @@ async def create_teacher_report(teacher_report: TeacherReport):
     created_report = await teachers_reports_collection.find_one(
         {"_id": new_report.inserted_id}
     )
-    return created_report
+    return TeacherReportCreateResponse(created=created_report, timestamp=datetime.now())
 
 
-@router.delete("/teacher-report/delete/{id}", response_model=TeacherReport)
+@router.delete("/teacher-report/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_teacher_report(id: str):
     deleted_report = await teachers_reports_collection.find_one_and_delete(
         {"_id": ObjectId(id)}
@@ -59,11 +60,8 @@ async def delete_teacher_report(id: str):
 
 @router.get("/personal-workload-report/list", response_model=ListPersonalWorkloadReport)
 async def read_personal_workload_report():
-    return ListPersonalWorkloadReport(
-        personal_workload_report=await personal_workload_reports_collection.find().to_list(
-            1000
-        )
-    )
+    reports = await personal_workload_reports_collection.find().to_list(1000)
+    return ListPersonalWorkloadReport(personal_workload_reports=reports)
 
 
 @router.get("/personal-workload-report/{id}", response_model=PersonalWorkloadReport)
@@ -83,21 +81,21 @@ async def read_personal_workload_report(id: str):
 async def create_personal_workload_report(
     personal_workload_report: PersonalWorkloadReport,
 ):
-    new_personal_workload_report = (
-        await personal_workload_reports_collection.insert_one(
-            personal_workload_report.model_dump(by_alias=True, exclude=["id"])
-        )
+    new_report = await personal_workload_reports_collection.insert_one(
+        personal_workload_report.model_dump(by_alias=True, exclude=["id"])
     )
-    created_personal_workload_report = (
-        await personal_workload_reports_collection.find_one(
-            {"_id": new_personal_workload_report.inserted_id}
-        )
+    created_report = await personal_workload_reports_collection.find_one(
+        {"_id": new_report.inserted_id}
     )
-    return created_personal_workload_report
+    return PersonalWorkloadReportCreateResponse(
+        created=created_report, timestamp=datetime.now()
+    )
 
 
-@router.get("/summary-report/list", response_model=ListSummaryClassesDepartmentReport)
+@router.get(
+    "/summary-classes-department-report/list",
+    response_model=ListSummaryClassesDepartmentReport,
+)
 async def read_reports():
-    return ListSummaryClassesDepartmentReport(
-        summary_report=await summary_reports_collection.find().to_list(1000)
-    )
+    reports = await summary_reports_collection.find().to_list(1000)
+    return ListSummaryClassesDepartmentReport(summary_reports=reports)
